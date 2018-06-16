@@ -15,8 +15,8 @@
     "@bigboat/mqtt-client": "^1.1.0",
     "body-parser": "~1.14.1",
     "coffee-script": "^1.12.4",
-    "forever": "^0.15.2",
     "express": "~4.13.3",
+    "forever": "^0.15.2",
     "fs-extra": "^0.30.0",
     "js-yaml": "^3.6.1",
     "lodash": "^4.15.0",
@@ -35,6 +35,7 @@
     "husky": "^0.13.2",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
+    "nodemon": "^1.17.5",
     "testdouble": "^2.1.0"
   }
 }
