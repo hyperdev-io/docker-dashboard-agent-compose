@@ -2,7 +2,7 @@ _ = require 'lodash'
 
 module.exports = (instanceName, serviceName, node, ssh, config) ->
   subDomain = "#{instanceName}.#{config.domain}.#{config.tld}"
-  hostname = "ssh.#{serviceName}.#{subDomain}"
+  hostname = "ssh.#{serviceName}.#{instanceName}"
   labels =
     'bigboat.instance.name': instanceName
     'bigboat.service.name': serviceName
@@ -15,7 +15,6 @@ module.exports = (instanceName, serviceName, node, ssh, config) ->
       image: 'jeroenpeeters/docker-ssh:docker-filter'
       depends_on: [serviceName]
       labels: labels
-      hostname: hostname
       networks: public: aliases: [hostname]
       deploy:
         mode: 'replicated'
@@ -40,6 +39,7 @@ module.exports = (instanceName, serviceName, node, ssh, config) ->
         '/etc/localtime:/etc/localtime:ro'
       ]
     sshCompose.environment.AUTH_TUPLES = authTuples if authTuples
+    sshCompose.hostname = hostname if hostname.length < 64
     sshCompose
 
   if typeof ssh is 'object'
