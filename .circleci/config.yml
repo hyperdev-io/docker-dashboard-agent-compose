@@ -54,6 +54,8 @@ workflows:
   version: 2
   build_test_push:
     jobs:
+      - test
+      - build
       - push_master:
           requires:
             - test
@@ -63,7 +65,7 @@ workflows:
               ignore: /.*/
             branches:
               only: master
-      - build_and_push_branch:
+      - push_branch:
           requires:
             - test
             - build
@@ -72,7 +74,7 @@ workflows:
               ignore: /.*/
             branches:
               only: /^feature.*$/
-      - build_and_push_tag:
+      - push_tag:
           requires:
             - test
             - build
