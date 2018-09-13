@@ -46,7 +46,7 @@ jobs:
       - image: docker:18-git
     steps:
       - run: |
-          docker tag hyperdev/agent:latest hyperdev/agent:${CIRCLE_BRANCH} .
+          docker tag hyperdev/agent:latest hyperdev/agent:${CIRCLE_BRANCH}
           docker login -u $DOCKER_USER -p $DOCKER_PASS
           docker push hyperdev/agent:latest
           docker push hyperdev/agent:${CIRCLE_BRANCH}
