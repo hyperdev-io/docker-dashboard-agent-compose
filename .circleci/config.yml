@@ -1,0 +1,83 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: docker:18-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker build -t hyperdev/agent:latest .
+  test:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run:
+          command: |
+            npm install
+            npm test
+      # - run:
+      #     shell: /bin/bash
+      #     command: |
+      #       # cp -r ./coverage/ $CIRCLE_ARTIFACTS
+      #       bash <(curl -s https://codecov.io/bash)
+      #       cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js -v
+  push_master:
+    docker:
+      - image: docker:18-git
+    steps:
+      - run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
+          docker push hyperdev/agent:latest
+  push_tag:
+    docker:
+      - image: docker:18-git
+    steps:
+      - run: |
+          MAJOR_VERSION=${CIRCLE_TAG/.*}; docker tag hyperdev/agent:latest hyperdev/agent:${MAJOR_VERSION}
+          MINOR_VERSION=${CIRCLE_TAG%.*}; docker tag hyperdev/agent:latest hyperdev/agent:${MINOR_VERSION}
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
+          docker push hyperdev/agent:latest
+          docker push hyperdev/agent:${CIRCLE_TAG}
+          docker push hyperdev/agent:${MINOR_VERSION}
+          docker push hyperdev/agent:${MAJOR_VERSION}
+  push_branch:
+    docker:
+      - image: docker:18-git
+    steps:
+      - run: |
+          docker tag hyperdev/agent:latest hyperdev/agent:${CIRCLE_BRANCH} .
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
+          docker push hyperdev/agent:latest
+          docker push hyperdev/agent:${CIRCLE_BRANCH}
+workflows:
+  version: 2
+  build_test_push:
+    jobs:
+      - push_master:
+          requires:
+            - test
+            - build
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: master
+      - build_and_push_branch:
+          requires:
+            - test
+            - build
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: /^feature.*$/
+      - build_and_push_tag:
+          requires:
+            - test
+            - build
+          filters:
+            tags:
+              only: /^[0-9]+\.[0-9]+\.[0-9]+$/
+            branches:
+              ignore: /.*/
