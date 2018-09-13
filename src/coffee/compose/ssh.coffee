@@ -15,7 +15,7 @@ module.exports = (instanceName, serviceName, node, ssh, config) ->
       image: 'jeroenpeeters/docker-ssh:docker-filter'
       depends_on: [serviceName]
       labels: labels
-      networks: public: aliases: [hostname]
+      networks: public: aliases: ["ssh.#{serviceName}.#{subDomain}"]
       deploy:
         mode: 'replicated'
         endpoint_mode: 'dnsrr'
