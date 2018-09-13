@@ -1,12 +1,5 @@
 version: 2
 jobs:
-  build:
-    docker:
-      - image: docker:18-git
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run: docker build -t hyperdev/agent:latest .
   test:
     docker:
       - image: circleci/node:10
@@ -22,18 +15,24 @@ jobs:
       #       # cp -r ./coverage/ $CIRCLE_ARTIFACTS
       #       bash <(curl -s https://codecov.io/bash)
       #       cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js -v
-  push_master:
+  build_push_master:
     docker:
       - image: docker:18-git
     steps:
+      - checkout
+      - setup_remote_docker
       - run: |
+          docker build -t hyperdev/agent:latest .
           docker login -u $DOCKER_USER -p $DOCKER_PASS
           docker push hyperdev/agent:latest
-  push_tag:
+  build_push_tag:
     docker:
       - image: docker:18-git
     steps:
+      - checkout
+      - setup_remote_docker
       - run: |
+          docker build -t hyperdev/agent:latest .
           MAJOR_VERSION=${CIRCLE_TAG/.*}; docker tag hyperdev/agent:latest hyperdev/agent:${MAJOR_VERSION}
           MINOR_VERSION=${CIRCLE_TAG%.*}; docker tag hyperdev/agent:latest hyperdev/agent:${MINOR_VERSION}
           docker login -u $DOCKER_USER -p $DOCKER_PASS
@@ -41,11 +40,14 @@ jobs:
           docker push hyperdev/agent:${CIRCLE_TAG}
           docker push hyperdev/agent:${MINOR_VERSION}
           docker push hyperdev/agent:${MAJOR_VERSION}
-  push_branch:
+  build_push_branch:
     docker:
       - image: docker:18-git
     steps:
+      - checkout
+      - setup_remote_docker
       - run: |
+          docker build -t hyperdev/agent:latest .
           docker tag hyperdev/agent:latest hyperdev/agent:${CIRCLE_BRANCH}
           docker login -u $DOCKER_USER -p $DOCKER_PASS
           docker push hyperdev/agent:latest
@@ -55,29 +57,25 @@ workflows:
   build_test_push:
     jobs:
       - test
-      - build
-      - push_master:
+      - build_push_master:
           requires:
             - test
-            - build
           filters:
             tags:
               ignore: /.*/
             branches:
               only: master
-      - push_branch:
+      - build_push_branch:
           requires:
             - test
-            - build
           filters:
             tags:
               ignore: /.*/
             branches:
               only: /^feature.*$/
-      - push_tag:
+      - build_push_tag:
           requires:
             - test
-            - build
           filters:
             tags:
               only: /^[0-9]+\.[0-9]+\.[0-9]+$/
