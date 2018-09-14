@@ -56,7 +56,7 @@ module.exports = (config) ->
 
   _addNetworkSettings: addNetworkSettings = (serviceName, service, instance, doc) ->
     subDomain = "#{instance}.#{config.domain}.#{config.tld}"
-    hostname = "#{serviceName}.#{instance}"
+    hostname = "#{serviceName}.#{instance}".replace(/_/g, "")
     service.hostname = hostname if hostname.length < 64
     service.networks = public: aliases: ["#{serviceName}.#{subDomain}"]
     service.networks.private = null if doc.services and Object.keys(doc.services)?.length > 1

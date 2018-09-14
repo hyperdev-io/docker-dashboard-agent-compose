@@ -2,7 +2,7 @@ _ = require 'lodash'
 
 module.exports = (instanceName, serviceName, node, ssh, config) ->
   subDomain = "#{instanceName}.#{config.domain}.#{config.tld}"
-  hostname = "ssh.#{serviceName}.#{instanceName}"
+  hostname = "ssh.#{serviceName}.#{instanceName}".replace(/_/g, "")
   labels =
     'bigboat.instance.name': instanceName
     'bigboat.service.name': serviceName
