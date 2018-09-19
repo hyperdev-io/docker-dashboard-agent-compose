@@ -6,6 +6,8 @@ standardCfg =
     image: 'ictu/pipes:2'
   network:
     name: 'apps'
+  swarm:
+    deployment_placement: '{}'
 
 describe 'Compose', ->
   describe 'augmentCompose', ->
