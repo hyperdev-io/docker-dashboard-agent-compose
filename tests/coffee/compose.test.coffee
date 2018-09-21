@@ -6,19 +6,9 @@ standardCfg =
     image: 'ictu/pipes:2'
   network:
     name: 'apps'
-  swarm:
-    deploy_placement: '{}'
 
 describe 'Compose', ->
   describe 'augmentCompose', ->
-    it 'should set the default deploy_placement', ->
-      doc =
-        services:
-          www: image: 'nginx'
-          db: image: 'postgres'
-        networks: {}
-      compose(standardCfg).augmentCompose '', {}, doc
-      assert.equal doc.services.www.deploy.placement, '{}'
     it 'should set the deploy_placement', ->
       doc =
         services:
