@@ -7,10 +7,26 @@ standardCfg =
   network:
     name: 'apps'
   swarm:
-    deployment_placement: '{}'
+    deploy_placement: '{}'
 
 describe 'Compose', ->
   describe 'augmentCompose', ->
+    it 'should set the default deploy_placement', ->
+      doc =
+        services:
+          www: image: 'nginx'
+          db: image: 'postgres'
+        networks: {}
+      compose(standardCfg).augmentCompose '', {}, doc
+      assert.equal doc.services.www.deploy.placement, '{}'
+    it 'should set the deploy_placement', ->
+      doc =
+        services:
+          www: image: 'nginx'
+          db: image: 'postgres'
+        networks: {}
+      compose(Object.assign {}, standardCfg, {swarm: deploy_placement: '{ "node" : { "role" : "worker" } }'}).augmentCompose '', {}, doc
+      assert.equal doc.services.www.deploy.placement, '{ "node" : { "role" : "worker" } }'
     it 'should set the compose version to 3.3', ->
       doc =
         version: '1.0'

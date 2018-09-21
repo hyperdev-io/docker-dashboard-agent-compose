@@ -72,7 +72,7 @@ module.exports = (config) ->
       mode: 'replicated'
       endpoint_mode: 'dnsrr'
       resources: defaultResources
-      placement: config.swarm.deployment_placement
+      placement: config.swarm.deploy_placement
     , service.deploy
 
   _addNetworks: addNetworks = (doc) ->
