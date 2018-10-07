@@ -18,12 +18,12 @@ compose = """
 
   """
 env =
-  BIGBOAT_PROJECT: config.domain
-  BIGBOAT_DOMAIN: config.domain
-  BIGBOAT_TLD: config.tld
-  BIGBOAT_APPLICATION_NAME: instanceCfg.app.name
-  BIGBOAT_APPLICATION_VERSION: instanceCfg.app.version
-  BIGBOAT_INSTANCE_NAME: instanceCfg.instance.name
+  HYPERDEV_PROJECT: config.domain
+  HYPERDEV_DOMAIN: config.domain
+  HYPERDEV_TLD: config.tld
+  HYPERDEV_APPLICATION_NAME: instanceCfg.app.name
+  HYPERDEV_APPLICATION_VERSION: instanceCfg.app.version
+  HYPERDEV_INSTANCE_NAME: instanceCfg.instance.name
 
 describe 'Compose Actions', ->
 

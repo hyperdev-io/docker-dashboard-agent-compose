@@ -100,9 +100,9 @@ module.exports = (config) ->
 #
 
 buildEnv = (cfg, instanceCfg) ->
-  BIGBOAT_PROJECT: cfg.domain
-  BIGBOAT_DOMAIN: cfg.domain
-  BIGBOAT_TLD: cfg.tld
-  BIGBOAT_APPLICATION_NAME: instanceCfg.app.name
-  BIGBOAT_APPLICATION_VERSION: instanceCfg.app.version
-  BIGBOAT_INSTANCE_NAME: instanceCfg.instance.name
+  HYPERDEV_PROJECT: cfg.domain
+  HYPERDEV_DOMAIN: cfg.domain
+  HYPERDEV_TLD: cfg.tld
+  HYPERDEV_APPLICATION_NAME: instanceCfg.app.name
+  HYPERDEV_APPLICATION_VERSION: instanceCfg.app.version
+  HYPERDEV_INSTANCE_NAME: instanceCfg.instance.name
