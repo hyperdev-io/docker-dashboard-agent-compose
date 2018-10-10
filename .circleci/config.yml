@@ -54,7 +54,7 @@ workflows:
   build_push:
     jobs:
       - test
-      - build_push_master
+      - build_push_master:
           filters:
             branches:
               only: master
