@@ -14,8 +14,8 @@ jobs:
       - run: |
           npm install
           npm test
-          bash <(curl -s https://codecov.io/bash)
-          cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js -v
+          # bash <(curl -s https://codecov.io/bash)
+          # cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js -v
   build_push_master:
     <<: *machine_config
     steps:
