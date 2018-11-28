@@ -88,10 +88,15 @@ describe 'Compose', ->
         existing_label: 'value'
         'bigboat.domain': 'google'
         'bigboat.tld': 'com'
-      compose(Object.assign {}, standardCfg, {domain:'google', tld:'com'})._addExtraLabels service
+      compose(Object.assign {}, standardCfg, {domain:'google', tld:'com'})._addExtraLabels 'myService', service, 'myInstance'
       assert.deepEqual service,
         labels: labels
         deploy: labels: labels
+    it 'should add traefik labels based on service labels', ->
+      service = labels: {'hyperdev.public': 'true'}
+      compose(Object.assign {}, standardCfg, {domain:'google', tld:'com', })._addExtraLabels 'myService', service, 'myInstance'
+      assert.equal service.labels['traefik.frontend.rule'], 'Host:myService-myInstance.google.public.com'
+      assert.equal service.labels['traefik.port'], '80'
 
   describe '_addVolumeMapping', ->
     volumeTest = (inputVolume, expectedVolume, opts = {storageBucket: 'bucket1'}) ->
