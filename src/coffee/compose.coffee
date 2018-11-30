@@ -26,7 +26,7 @@ module.exports = (config) ->
       'bigboat.domain': config.domain
       'bigboat.tld': config.tld
 
-    if service.labels?['hyperdev.public'] is 'true'
+    if service.labels?['hyperdev.public']
       labels = _.extend labels,
         'traefik.frontend.rule': "Host:#{serviceName}-#{instance}.#{config.domain}.public.#{config.tld}"
         'traefik.port': '80'
