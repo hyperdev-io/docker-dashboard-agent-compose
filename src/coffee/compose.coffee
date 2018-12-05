@@ -22,14 +22,14 @@ module.exports = (config) ->
     resolvep root, path
 
   _addExtraLabels: addExtraLabels = (serviceName, service, instance) ->
-    labels = _.extend {}, service.labels,
+    labels = _.extend {}, service.labels, (service.deploy?.labels or {}),
       'bigboat.domain': config.domain
       'bigboat.tld': config.tld
 
-    if service.labels?['hyperdev.public']
+    if labels?['hyperdev.public.proxy.port']
       labels = _.extend labels,
         'traefik.frontend.rule': "Host:#{serviceName}-#{instance}.#{config.domain}.public.#{config.tld}"
-        'traefik.port': '80'
+        'traefik.port': labels?['hyperdev.public.proxy.port']
     service.deploy = if service.deploy then service.deploy else {}
     service.labels = service.deploy.labels = labels
 
