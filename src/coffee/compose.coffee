@@ -27,7 +27,7 @@ module.exports = (config) ->
       'bigboat.tld': config.tld
 
     if labels?['hyperdev.public.proxy.port']
-      publicHost = "#{serviceName}-#{instance}.#{config.domain}.public.#{config.tld}"
+      publicHost = "#{serviceName}.#{instance}.#{config.domain}.public.#{config.tld}"
       labels = _.extend labels,
         'hyperdev.public.proxy.host': publicHost
         'traefik.frontend.rule': "Host:#{publicHost}"
