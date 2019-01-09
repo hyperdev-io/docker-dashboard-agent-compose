@@ -95,7 +95,7 @@ describe 'Compose', ->
     it 'should add traefik labels based on service labels', ->
       service = deploy: labels: 'hyperdev.public.proxy.port': 3000
       compose(Object.assign {}, standardCfg, {domain:'google', tld:'com', })._addExtraLabels 'myService', service, 'myInstance'
-      assert.equal service.labels['traefik.frontend.rule'], 'Host:myService-myInstance.google.public.com'
+      assert.equal service.labels['traefik.frontend.rule'], 'Host:myService.myInstance.google.public.com'
       assert.equal service.labels['traefik.port'], 3000
 
   describe '_addVolumeMapping', ->
