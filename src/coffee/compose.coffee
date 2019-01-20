@@ -82,6 +82,12 @@ module.exports = (config) ->
       placement: config.swarm?.deploy_placement
     , service.deploy
 
+  _addEssentialInstanceConstraints: addEssentialInstanceConstraints = (service) ->
+    labels = service.labels or service.deploy.labels
+    if labels?['bigboat.instance.essential'] in ['True', 'true', true]
+      service.deploy.placement.constraints ?= []
+      service.deploy.placement.constraints.push 'node.labels.essentials == true'
+
   _addNetworks: addNetworks = (doc) ->
     doc.networks = public: external: name: config.network.name
     doc.networks.private = null if doc.services and Object.keys(doc.services)?.length > 1
@@ -95,6 +101,7 @@ module.exports = (config) ->
     addNetworks doc
     for serviceName, service of doc.services
       addDeploymentSettings service
+      addEssentialInstanceConstraints service
       addExtraLabels serviceName, service, instance
       addNetworkSettings serviceName, service, instance, doc
       addVolumeMapping service, options
