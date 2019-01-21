@@ -84,9 +84,11 @@ module.exports = (config) ->
 
   _addEssentialInstanceConstraints: addEssentialInstanceConstraints = (service) ->
     labels = service.labels or service.deploy.labels
+    service.deploy?.placement?.constraints ?= []
     if labels?['bigboat.instance.essential'] in ['True', 'true', true]
-      service.deploy.placement.constraints ?= []
-      service.deploy.placement.constraints.push 'node.labels.essentials == true'
+      service.deploy?.placement?.constraints?.push 'node.labels.essentials == true'
+    else
+      service.deploy?.placement?.constraints?.push 'node.labels.essentials != true'
 
   _addNetworks: addNetworks = (doc) ->
     doc.networks = public: external: name: config.network.name
