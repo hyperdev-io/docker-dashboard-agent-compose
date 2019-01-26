@@ -1,17 +1,17 @@
 {
   "name": "docker-dashboard-agent-compose",
-  "version": "5.2.0",
-  "description": "",
+  "version": "5.3.0",
+  "description": "The HyperDev Agent",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/forever --minUptime 2500 --spinSleepTime 5000 ./node_modules/.bin/coffee index.coffee",
+    "start": "forever --minUptime 2500 --spinSleepTime 5000 ./node_modules/.bin/coffee index.coffee",
     "test": "mocha --recursive --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul tests && istanbul report text lcov",
     "test:html": "mocha --recursive --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul tests && istanbul report html lcov",
     "test:watch": "mocha --recursive --compilers coffee:coffee-script/register --watch-extensions test.coffee --watch tests ",
     "precommit": "npm test",
     "prepush": "npm test"
   },
-  "author": "",
+  "author": "HyperDev BV",
   "license": "Apache-2.0",
   "dependencies": {
     "@bigboat/mqtt-client": "^1.1.0",
