@@ -1,0 +1,71 @@
+version: 2
+
+references:
+  machine_config: &machine_config
+    working_directory: /tmp/circle
+    machine: true
+
+jobs:
+  test:
+    docker:
+      - image: node:8-slim
+    steps:
+      - checkout
+      - run: |
+          npm install
+          npm test
+          # bash <(curl -s https://codecov.io/bash)
+          # cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js -v
+  build_push_master:
+    <<: *machine_config
+    steps:
+      - checkout
+      - run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
+          docker build -t hyperdev/agent .
+          docker push hyperdev/agent:latest
+  build_push_tag:
+    <<: *machine_config
+    steps:
+      - checkout
+      - run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
+          docker build -t hyperdev/agent .
+          MAJOR_VERSION=${CIRCLE_TAG/.*}; docker tag hyperdev/agent:latest hyperdev/agent:${MAJOR_VERSION}
+          MINOR_VERSION=${CIRCLE_TAG%.*}; docker tag hyperdev/agent:latest hyperdev/agent:${MINOR_VERSION}
+          docker tag hyperdev/agent:latest hyperdev/agent:${CIRCLE_TAG}
+          docker push hyperdev/agent:latest
+          docker push hyperdev/agent:${CIRCLE_TAG}
+          docker push hyperdev/agent:${MINOR_VERSION}
+          docker push hyperdev/agent:${MAJOR_VERSION}
+  build_push_branch:
+    <<: *machine_config
+    steps:
+      - checkout
+      - run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
+          docker build -t hyperdev/agent .
+          docker tag hyperdev/agent:latest hyperdev/agent:${CIRCLE_BRANCH}
+          docker push hyperdev/agent:latest
+          docker push hyperdev/agent:${CIRCLE_BRANCH}
+workflows:
+  version: 2
+  build_push:
+    jobs:
+      - test
+      - build_push_master:
+          filters:
+            branches:
+              only: master
+      - build_push_branch:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: /^feature.*$/
+      - build_push_tag:
+          filters:
+            tags:
+              only: /^[0-9]+\.[0-9]+\.[0-9]+$/
+            branches:
+              ignore: /.*/
