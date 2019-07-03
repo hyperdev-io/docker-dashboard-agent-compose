@@ -30,6 +30,9 @@ module.exports = (config) ->
 
   _addVolumeMapping: addVolumeMapping = (service, options) ->
     bucketPath = path.join config.dataDir, config.domain, options.storageBucket if options.storageBucket
+    if !options.stateful
+      delete service.volumes
+      return
     service.volumes = service.volumes?.map (v) ->
       vsplit = v.split ':'
       try
