@@ -3,6 +3,7 @@ path          = require 'path'
 Mqtt          = require '@bigboat/mqtt-client'
 config        = require './src/coffee/config'
 packageJson   = require './package.json'
+events = require 'events'
 
 try
   fs.mkdirSync (projectDataPath = path.join config.dataDir, config.domain)
@@ -14,6 +15,8 @@ catch err
 libcompose = (require './src/coffee/compose') config
 
 mqtt = Mqtt()
+
+logsEventEmitter = new events.EventEmitter()
 
 publishSystemMem = (data) -> mqtt.publish '/system/memory', data
 publishSystemUptime = (data) -> mqtt.publish '/system/uptime', data
@@ -56,12 +59,27 @@ stopHandler = (data) ->
       data: logData
     mqtt.publish '/agent/docker/log/teardown', event
 
+startLogsHandler = (data) ->
+  logsEventEmitter = new events.EventEmitter()
+  logs = compose.logs data, logsEventEmitter
+  logsEventEmitter.on 'stop_log_' + data.serviceName, (logData) ->
+    logs.kill('SIGTERM');
+  logsEventEmitter.on 'send_log', (logData) ->
+    mqtt.publish '/send_log', logData
+
+stopLogsHandler = (data) ->
+  logsEventEmitter.emit 'stop_log_' + data.serviceName
+
 require('./src/coffee/storage') mqtt, config
 
 mqtt.on 'message', (topic, data) -> 
   switch topic
     when '/commands/instance/stop' then stopHandler JSON.parse data
     when '/commands/instance/start' then startHandler JSON.parse data
+    when '/commands/logs/start' then startLogsHandler JSON.parse data
+    when '/commands/logs/stop' then stopLogsHandler JSON.parse data
 
 mqtt.subscribe('/commands/instance/stop')
 mqtt.subscribe('/commands/instance/start')
+mqtt.subscribe('/commands/logs/start')
+mqtt.subscribe('/commands/logs/stop')
