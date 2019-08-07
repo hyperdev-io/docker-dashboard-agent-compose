@@ -63,7 +63,9 @@ startLogsHandler = (data) ->
   logsEventEmitter = new events.EventEmitter()
   logs = compose.logs data, logsEventEmitter
   logsEventEmitter.on 'stop_log_' + data.serviceName, (logData) ->
-    logs.kill('SIGTERM');
+    logs.stdout.destroy();
+    logs.stderr.destroy();
+    logs.kill();
   logsEventEmitter.on 'send_log', (logData) ->
     mqtt.publish '/send_log', logData
 
