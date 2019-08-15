@@ -62,12 +62,15 @@ stopHandler = (data) ->
 startLogsHandler = (data) ->
   logsEventEmitter = new events.EventEmitter()
   logs = compose.logs data, logsEventEmitter
-  logsEventEmitter.on 'stop_log_' + data.serviceName, (logData) ->
+  logsEventEmitter.on 'stop_log_' + data.serviceName, () ->
+    console.log('stop','stop_log_' + data.serviceName)
+    console.log('logs', logs)
     logs.stdout.destroy();
     logs.stderr.destroy();
     logs.kill();
   logsEventEmitter.on 'send_log', (logData) ->
-    mqtt.publish '/send_log', logData
+    console.log(logData)
+    mqtt.publish '/send_log/'+data.serviceName+'/'+data.sessionId, logData
 
 stopLogsHandler = (data) ->
   logsEventEmitter.emit 'stop_log_' + data.serviceName
