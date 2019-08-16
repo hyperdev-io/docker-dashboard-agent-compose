@@ -60,20 +60,19 @@ stopHandler = (data) ->
     mqtt.publish '/agent/docker/log/teardown', event
 
 startLogsHandler = (data) ->
-  logsEventEmitter = new events.EventEmitter()
   logs = compose.logs data, logsEventEmitter
-  logsEventEmitter.on 'stop_log_' + data.serviceName, () ->
+  logsEventEmitter.on 'stop_log_' + data.serviceName+data.sessionId, () ->
     console.log('stop','stop_log_' + data.serviceName)
-    console.log('logs', logs)
+    console.log('closed pid', logs.pid)
     logs.stdout.destroy();
     logs.stderr.destroy();
     logs.kill();
-  logsEventEmitter.on 'send_log', (logData) ->
+  logsEventEmitter.on 'send_log' + data.serviceName+data.sessionId, (logData) ->
     console.log(logData)
     mqtt.publish '/send_log/'+data.serviceName+'/'+data.sessionId, logData
 
 stopLogsHandler = (data) ->
-  logsEventEmitter.emit 'stop_log_' + data.serviceName
+  logsEventEmitter.emit 'stop_log_' + data.serviceName+data.sessionId
 
 require('./src/coffee/storage') mqtt, config
 
