@@ -97,7 +97,7 @@ module.exports = (config) ->
 
   logs: (data, eventEmitter) ->
     emitLogCb = (message) ->
-      eventEmitter.emit 'send_log' + data.serviceName+data.sessionId, message.toString()
+      eventEmitter.emit 'send_log' + data.serviceFullName, message.toString()
     lib.runLogs 'docker', ['service', 'logs', '--follow', '--raw', '--timestamps', '--tail=1000', data.serviceName], {stderr: emitLogCb, stdout: emitLogCb}
 
 #

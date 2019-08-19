@@ -61,18 +61,17 @@ stopHandler = (data) ->
 
 startLogsHandler = (data) ->
   logs = compose.logs data, logsEventEmitter
-  logsEventEmitter.on 'stop_log_' + data.serviceName+data.sessionId, () ->
-    console.log('stop','stop_log_' + data.serviceName)
+  logsEventEmitter.on 'stop_log' + data.serviceFullName, () ->
+    console.log('stop','stop_log' + data.serviceFullName)
     console.log('closed pid', logs.pid)
     logs.stdout.destroy();
     logs.stderr.destroy();
     logs.kill();
-  logsEventEmitter.on 'send_log' + data.serviceName+data.sessionId, (logData) ->
-    console.log(logData)
-    mqtt.publish '/send_log/'+data.serviceName+'/'+data.sessionId, logData
+  logsEventEmitter.on 'send_log' + data.serviceFullName, (logData) ->
+    mqtt.publish '/send_log/' + data.serviceFullName, logData
 
 stopLogsHandler = (data) ->
-  logsEventEmitter.emit 'stop_log_' + data.serviceName+data.sessionId
+  logsEventEmitter.emit 'stop_log' + data.serviceFullName
 
 require('./src/coffee/storage') mqtt, config
 
