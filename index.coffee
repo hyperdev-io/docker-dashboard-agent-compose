@@ -68,6 +68,8 @@ startLogsHandler = (data) ->
     logs.stderr.destroy();
     logs.kill();
   logsEventEmitter.on 'send_log' + data.serviceFullName, (logData) ->
+    console.log(logData)
+    console.log(logData.length)
     mqtt.publish '/send_log/' + data.serviceFullName, logData
 
 stopLogsHandler = (data) ->
