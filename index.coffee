@@ -59,6 +59,14 @@ stopHandler = (data) ->
       data: logData
     mqtt.publish '/agent/docker/log/teardown', event
 
+startDownloadLogsHandler = (data) ->
+  logs = compose.logsDownload data, logsEventEmitter
+  completeLog = ''
+  logsEventEmitter.on 'stop_log_download' + data.serviceFullName, () ->
+    mqtt.publish '/send_log_download/' + data.serviceFullName, completeLog
+  logsEventEmitter.on 'send_log_download' + data.serviceFullName, (logData) ->
+    completeLog = completeLog+logData
+
 startLogsHandler = (data) ->
   logs = compose.logs data, logsEventEmitter
   logsEventEmitter.on 'stop_log' + data.serviceFullName, () ->
@@ -68,8 +76,6 @@ startLogsHandler = (data) ->
     logs.stderr.destroy();
     logs.kill();
   logsEventEmitter.on 'send_log' + data.serviceFullName, (logData) ->
-    console.log(logData)
-    console.log(logData.length)
     mqtt.publish '/send_log/' + data.serviceFullName, logData
 
 stopLogsHandler = (data) ->
@@ -81,10 +87,12 @@ mqtt.on 'message', (topic, data) ->
   switch topic
     when '/commands/instance/stop' then stopHandler JSON.parse data
     when '/commands/instance/start' then startHandler JSON.parse data
+    when '/commands/logs/download' then startDownloadLogsHandler JSON.parse data
     when '/commands/logs/start' then startLogsHandler JSON.parse data
     when '/commands/logs/stop' then stopLogsHandler JSON.parse data
 
 mqtt.subscribe('/commands/instance/stop')
 mqtt.subscribe('/commands/instance/start')
+mqtt.subscribe('/commands/logs/download')
 mqtt.subscribe('/commands/logs/start')
 mqtt.subscribe('/commands/logs/stop')
