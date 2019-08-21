@@ -14,6 +14,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@bigboat/mqtt-client": "^1.1.0",
+    "anser": "^1.4.8",
     "body-parser": "~1.14.1",
     "coffee-script": "^1.12.4",
     "express": "~4.13.3",

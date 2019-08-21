@@ -3,6 +3,7 @@ path          = require 'path'
 Mqtt          = require '@bigboat/mqtt-client'
 config        = require './src/coffee/config'
 packageJson   = require './package.json'
+Anser         = require 'anser'
 events = require 'events'
 
 try
@@ -65,7 +66,7 @@ startDownloadLogsHandler = (data) ->
   logsEventEmitter.on 'stop_log_download' + data.serviceFullName, () ->
     mqtt.publish '/send_log_download/' + data.serviceFullName, completeLog
   logsEventEmitter.on 'send_log_download' + data.serviceFullName, (logData) ->
-    completeLog = completeLog+logData
+    completeLog = completeLog + Anser.ansiToText(logData)
 
 startLogsHandler = (data) ->
   logs = compose.logs data, logsEventEmitter
