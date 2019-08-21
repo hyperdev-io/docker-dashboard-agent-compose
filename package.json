@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "./node_modules/.bin/forever --minUptime 2500 --spinSleepTime 5000 ./node_modules/.bin/coffee index.coffee",
+    "dev": "nodemon --inspect=0.0.0.0:9227 index.coffee",
     "test_disabled": "mocha --recursive --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul tests && istanbul report text lcov",
     "test:html": "mocha --recursive --compilers coffee:coffee-script/register --require coffee-coverage/register-istanbul tests && istanbul report html lcov",
     "test:watch": "mocha --recursive --compilers coffee:coffee-script/register --watch-extensions test.coffee --watch tests "
@@ -13,6 +14,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@bigboat/mqtt-client": "^1.1.0",
+    "anser": "^1.4.8",
     "body-parser": "~1.14.1",
     "coffee-script": "^1.12.4",
     "express": "~4.13.3",

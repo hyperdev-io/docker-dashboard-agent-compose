@@ -3,6 +3,8 @@ path          = require 'path'
 Mqtt          = require '@bigboat/mqtt-client'
 config        = require './src/coffee/config'
 packageJson   = require './package.json'
+Anser         = require 'anser'
+events = require 'events'
 
 try
   fs.mkdirSync (projectDataPath = path.join config.dataDir, config.domain)
@@ -14,6 +16,8 @@ catch err
 libcompose = (require './src/coffee/compose') config
 
 mqtt = Mqtt()
+
+logsEventEmitter = new events.EventEmitter()
 
 publishSystemMem = (data) -> mqtt.publish '/system/memory', data
 publishSystemUptime = (data) -> mqtt.publish '/system/uptime', data
@@ -56,12 +60,40 @@ stopHandler = (data) ->
       data: logData
     mqtt.publish '/agent/docker/log/teardown', event
 
+startDownloadLogsHandler = (data) ->
+  logs = compose.logsDownload data, logsEventEmitter
+  completeLog = ''
+  logsEventEmitter.on 'stop_log_download' + data.serviceFullName, () ->
+    mqtt.publish '/send_log_download/' + data.serviceFullName, completeLog
+  logsEventEmitter.on 'send_log_download' + data.serviceFullName, (logData) ->
+    completeLog = completeLog + Anser.ansiToText(logData)
+
+startLogsHandler = (data) ->
+  logs = compose.logs data, logsEventEmitter
+  logsEventEmitter.on 'stop_log' + data.serviceFullName, () ->
+    console.log('stop','stop_log' + data.serviceFullName)
+    console.log('closed pid', logs.pid)
+    logs.stdout.destroy();
+    logs.stderr.destroy();
+    logs.kill();
+  logsEventEmitter.on 'send_log' + data.serviceFullName, (logData) ->
+    mqtt.publish '/send_log/' + data.serviceFullName, logData
+
+stopLogsHandler = (data) ->
+  logsEventEmitter.emit 'stop_log' + data.serviceFullName
+
 require('./src/coffee/storage') mqtt, config
 
 mqtt.on 'message', (topic, data) -> 
   switch topic
     when '/commands/instance/stop' then stopHandler JSON.parse data
     when '/commands/instance/start' then startHandler JSON.parse data
+    when '/commands/logs/download' then startDownloadLogsHandler JSON.parse data
+    when '/commands/logs/start' then startLogsHandler JSON.parse data
+    when '/commands/logs/stop' then stopLogsHandler JSON.parse data
 
 mqtt.subscribe('/commands/instance/stop')
 mqtt.subscribe('/commands/instance/start')
+mqtt.subscribe('/commands/logs/download')
+mqtt.subscribe('/commands/logs/start')
+mqtt.subscribe('/commands/logs/stop')
